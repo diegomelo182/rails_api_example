@@ -2,9 +2,15 @@ class Api::V1::GuestController < ApplicationController
 
   def index
     json_return = Hash.new
-    all_guests = Guest
 
-    all_guests = params[:limit] && params[:offset] ? all_guests.limit(params[:limit]).offset(params[:offset]) : params[:limit] ? all_guests.limit(params[:limit]) : params[:offset] ? all_guests.offset(params[:offset]) : all_guests.all
+    offset = params[:offset] ? params[:offset].to_i : 0
+    limit = params[:limit] ? params[:limit].to_i : 0
+
+    if offset == 0 && limit == 0
+      all_guests = Guest.all
+    else
+      all_guests = Guest.limit(limit).offset(offset)
+    end
 
     json_return['info'] = { 
       'offset' => params[:offset] ? params[:offset].to_i : 0,
