@@ -16,6 +16,7 @@ class Api::V1::GuestController < ApplicationController
       'offset' => params[:offset] ? params[:offset].to_i : 0,
       'limit' => params[:limit] ? params[:limit].to_i : 0,
       'counter' => all_guests.length,
+      'total' => Guest.all.length,
     }
     json_return['query_return'] = all_guests
 
@@ -45,16 +46,48 @@ class Api::V1::GuestController < ApplicationController
       status = 200
       json_return = guest
     else
-      json_return = {"error" => "Usuário não encontrado"}
+      json_return = {"error" => "Guest not found"}
     end
 
     render :json => json_return, :status => status
   end
 
   def update
+    json_return = Hash.new
+    status = 400
+    guest = Guest.find_by(id: params[:id])
+
+    if guest
+      if guest.update(guest_params)
+        status = 200
+        response.headers["Location"] = "/api/v1/guests/#{guest.id}" # header response  
+      else
+        json_return = {"error" => "Guest not updated on the database"}
+      end
+    else
+      json_return = {"error" => "Guest not found"}
+    end
+
+    render :nothing => true, :status => status, :content_type => 'text/html'
   end
 
   def destroy
+    json_return = Hash.new
+    status = 400
+    guest = Guest.find_by(id: params[:id])
+
+    if guest
+      if guest.delete
+        status = 200
+        response.headers["Entity"] = params[:id]  
+      else
+        json_return = {"error" => "Guest not removed on the database"}
+      end
+    else
+      json_return = {"error" => "Guest not found"}
+    end
+
+    render :nothing => true, :status => status, :content_type => 'text/html'
   end
 
   private
