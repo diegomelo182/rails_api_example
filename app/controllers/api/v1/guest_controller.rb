@@ -12,12 +12,12 @@ class Api::V1::GuestController < ApplicationController
       all_guests = Guest.limit(limit).offset(offset)
     end
 
-    json_return['info'] = { 
+    json_return['query_info'] = { 
       'offset' => params[:offset] ? params[:offset].to_i : 0,
       'limit' => params[:limit] ? params[:limit].to_i : 0,
       'counter' => all_guests.length,
     }
-    json_return['data'] = all_guests
+    json_return['query_return'] = all_guests
 
     render :json => json_return
   end
@@ -29,6 +29,7 @@ class Api::V1::GuestController < ApplicationController
     if guest.valid?
       if guest.save
         status = 201
+        response.headers["Location"] = "/api/v1/guests/#{guest.id}" # header response
       end
     end
 
@@ -36,6 +37,18 @@ class Api::V1::GuestController < ApplicationController
   end
 
   def show
+    json_return = Hash.new
+    status = 400
+    guest = Guest.find_by(id: params[:id])
+
+    if guest
+      status = 200
+      json_return = guest
+    else
+      json_return = {"error" => "Usuário não encontrado"}
+    end
+
+    render :json => json_return, :status => status
   end
 
   def update

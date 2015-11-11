@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   # my api
   namespace :api do
     namespace :v1 do
-      scope '/guest' do
+      scope '/guests' do
         get '/', to: 'guest#index'
         post '/', to: 'guest#create'
         get '/:id', to: 'guest#show'
