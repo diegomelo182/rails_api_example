@@ -24,7 +24,7 @@ class Api::V1::GuestController < ApplicationController
   end
 
   def create
-    status = 401
+    status = 400
 
     guest = Guest.new(guest_params)
     if guest.valid?
